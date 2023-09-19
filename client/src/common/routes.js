@@ -5,4 +5,6 @@ export const Urls = {
     //api
     getList: 'getthings',
     addList: 'acceptthings',
+    updateList: `acceptthings`,
+    deleteList: `acceptthings`,
   };

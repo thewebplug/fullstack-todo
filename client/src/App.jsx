@@ -96,8 +96,53 @@ function App() {
     }
   };
 
+  const deleteItem = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/acceptthings/${id}`, {
+        method: "DELETE",
+      });
 
+      if (response.ok) {
+        // Remove the deleted item from the local state (todos)
+        setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+      } else {
+        console.error("Failed to delete todo");
+      }
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
 
+  const saveEdit = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/acceptthings/${id}`, {
+        method: "PUT", // Use PUT method to update the task
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          task: editedTaskText,
+          is_completed: false, // You can set this based on your logic
+        }),
+      });
+
+      if (response.ok) {
+        // Update the task in the local state (todos)
+        setTodos((prevTodos) =>
+          prevTodos.map((todo) =>
+            todo.id === id ? { ...todo, task: editedTaskText } : todo
+          )
+        );
+
+        // Reset edit state
+        cancelEdit();
+      } else {
+        console.error("Failed to update todo");
+      }
+    } catch (error) {
+      console.error("Error updating todo:", error);
+    }
+  };
 
   return (
     <div className="max-w-xl mx-auto p-4 bg-black">
@@ -143,6 +188,7 @@ function App() {
                 />
                 <button
                   type="button"
+                  onClick={() => saveEdit(todo.id)}
                   className="text-green-500 hover:text-green-700 pl-2"
                 >
                   Save
@@ -165,7 +211,13 @@ function App() {
                 >
                   Edit
                 </button>
-                
+                <button
+                  type="button"
+                  onClick={() => deleteItem(todo.id)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Delete
+                </button>
               </>
             )}
           </li>
